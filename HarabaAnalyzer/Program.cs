@@ -29,14 +29,15 @@ namespace HarabaAnalyzer
             using (var workspace = MSBuildWorkspace.Create())
             {
                 workspace.WorkspaceFailed += (o, e) => Console.WriteLine(e.Diagnostic.Message);
+                var path = args[0].TrimEnd('\\');
                 
-                if (args.Length > 1 && args[1] == "--project")
+                if (path.EndsWith(".csproj"))
                 {
-                    await StartProjectAnalyze(workspace, args[0]);
+                    await StartProjectAnalyze(workspace, path);
                 }
                 else
                 {
-                    await StartSolutionAnalyze(workspace, args[0]);
+                    await StartSolutionAnalyze(workspace, path);
                 }
             }
 
