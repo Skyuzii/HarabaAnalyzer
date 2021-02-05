@@ -13,6 +13,7 @@ namespace HarabaAnalyzer.Common
             var services = new ServiceCollection();
 
             services.AddTransient(typeof(Worker));
+            services.AddSingleton(typeof(Logger));
             services.AddAnalyzers();
             
             _provider = services.BuildServiceProvider();

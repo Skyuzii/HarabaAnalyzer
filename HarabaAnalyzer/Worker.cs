@@ -14,10 +14,12 @@ namespace HarabaAnalyzer
 {
     public class Worker
     {
+        private readonly Logger _logger;
         private readonly IEnumerable<BaseAnalyzer> _analyzers;
 
-        public Worker(IEnumerable<BaseAnalyzer> analyzers)
+        public Worker(IEnumerable<BaseAnalyzer> analyzers, Logger logger)
         {
+            _logger = logger;
             _analyzers = analyzers.ToList();
         }
 
@@ -42,7 +44,7 @@ namespace HarabaAnalyzer
                 }
             }
 
-            CompleteAnalyze();
+            _logger.CompleteAnalyze();
         }
 
         private async Task StartSolutionAnalyze(MSBuildWorkspace workspace, string solutionPath)
@@ -78,27 +80,5 @@ namespace HarabaAnalyzer
                 _analyzers.ForEach(async x => await x.Execute(root));
             }
         }
-
-        private void CompleteAnalyze()
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Анализ успешно завершен");
-            Console.ResetColor();
-        }
-        
-        private class ConsoleProgressReporter : IProgress<ProjectLoadProgress>
-        {
-            public void Report(ProjectLoadProgress loadProgress)
-            {
-                var projectDisplay = Path.GetFileName(loadProgress.FilePath);
-                if (loadProgress.TargetFramework != null)
-                {
-                    projectDisplay += $" ({loadProgress.TargetFramework})";
-                }
-
-                Console.WriteLine($"{loadProgress.Operation,-15} {loadProgress.ElapsedTime,-15:m\\:ss\\.fffffff} {projectDisplay}");
-            }
-        }
-
     }
 }

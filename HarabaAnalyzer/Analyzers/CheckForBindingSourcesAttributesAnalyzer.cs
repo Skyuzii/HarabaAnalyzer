@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarabaAnalyzer.Abstracts;
@@ -10,6 +11,10 @@ namespace HarabaAnalyzer.Analyzers
 {
     public class CheckForBindingSourcesAttributesAnalyzer : BaseAnalyzer
     {
+        public CheckForBindingSourcesAttributesAnalyzer(Logger logger) : base(logger)
+        {
+        }
+
         public override MessageType Type => MessageType.Warning;
         
         public override Task Execute(SyntaxNode root)
@@ -24,26 +29,24 @@ namespace HarabaAnalyzer.Analyzers
                 "FromBody"
             };
 
-            foreach (var @class in root.DescendantNodes().OfType<ClassDeclarationSyntax>().Where(x => x.Identifier.ValueText.EndsWith("Controller")).ToList())
+            foreach (var parameter in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                .Where(x => x.Parent is ClassDeclarationSyntax syntax && syntax.Identifier.ValueText.EndsWith("Controller"))
+                .SelectMany(method => method.ParameterList.Parameters))
             {
-                foreach (var parameter in root.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList().SelectMany(method => method.ParameterList.Parameters))
+                if (parameter.AttributeLists.Count == 0)
                 {
-                    if (parameter.AttributeLists.Count == 0)
-                    {
-                        WriteInformation(@class, parameter, warningMessage);
-                        continue;
-                    }
+                    _logger.Write(parameter, Type, warningMessage);
+                    continue;
+                }
 
-                    foreach (var attributes in parameter.AttributeLists)
-                    {
-                        foreach (var attribute in attributes.Attributes.Where(x => x.Name.ToString() != "FromServices" && !sourceBindingAttributesList.Contains(x.Name.ToString())))
-                        {
-                            WriteInformation(@class, parameter, warningMessage);
-                        }
-                    }
+                if (parameter.AttributeLists.Any(x => x.Attributes.Any(attribute =>
+                    attribute.Name.ToString() != "FromServices" &&
+                    !sourceBindingAttributesList.Contains(attribute.Name.ToString()))))
+                {
+                    _logger.Write(parameter, Type, warningMessage);
                 }
             }
-            
+
             return Task.CompletedTask;
         }
     }
