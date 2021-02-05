@@ -33,15 +33,11 @@ namespace HarabaAnalyzer.Analyzers
                 .Where(x => x.Parent is ClassDeclarationSyntax syntax && syntax.Identifier.ValueText.EndsWith("Controller"))
                 .SelectMany(method => method.ParameterList.Parameters))
             {
-                if (parameter.AttributeLists.Count == 0)
-                {
-                    _logger.Write(parameter, Type, warningMessage);
-                    continue;
-                }
-
-                if (parameter.AttributeLists.Any(x => x.Attributes.Any(attribute =>
+                var hasNoAttribute = parameter.AttributeLists.Any(x => x.Attributes.Any(attribute =>
                     attribute.Name.ToString() != "FromServices" &&
-                    !sourceBindingAttributesList.Contains(attribute.Name.ToString()))))
+                    !sourceBindingAttributesList.Contains(attribute.Name.ToString())));
+                
+                if (parameter.AttributeLists.Count == 0 || hasNoAttribute)
                 {
                     _logger.Write(parameter, Type, warningMessage);
                 }
