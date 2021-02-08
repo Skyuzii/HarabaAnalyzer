@@ -11,6 +11,7 @@ namespace HarabaAnalyzer.Common
             var location = node.GetLocation();
             var filePath = location.SourceTree.FilePath;
             var spanStart = location.GetLineSpan().Span.Start;
+            var spanEnd = location.GetLineSpan().Span.End;
 
             Console.ForegroundColor = ConsoleColor.Yellow;
 
@@ -23,6 +24,10 @@ namespace HarabaAnalyzer.Common
             Console.ResetColor();
                 
             Console.Write($"{node.SyntaxTree.GetText().Lines[spanStart.Line],10}");
+            Console.Write("\n" + new string(' ', spanStart.Character + 2));
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(new string('~', spanEnd.Character - spanStart.Character));
             Console.ResetColor();
         }
         

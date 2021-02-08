@@ -19,7 +19,7 @@ namespace HarabaAnalyzer.Analyzers
         
         public override Task Execute(SyntaxNode root)
         {
-            var warningMessage = "Нет атрибута для явного указания источника привязки";
+            const string warningMessage = "Нет атрибута для явного указания источника привязки";
             var sourceBindingAttributesList = new List<string>
             {
                 "FromHeader",

@@ -24,6 +24,7 @@ namespace HarabaAnalyzer.Common
         private static void AddAnalyzers(this IServiceCollection services)
         {
             services.AddTransient(typeof(BaseAnalyzer), typeof(CheckForBindingSourcesAttributesAnalyzer));
+            services.AddTransient(typeof(BaseAnalyzer), typeof(CheckForHttpAttributesAnalyzer));
         }
     }
 }
