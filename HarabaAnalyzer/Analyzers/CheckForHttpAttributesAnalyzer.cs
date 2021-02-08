@@ -33,7 +33,7 @@ namespace HarabaAnalyzer.Analyzers
 
             foreach (var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>()
                 .Where(x => x.Parent is ClassDeclarationSyntax syntax && syntax.Identifier.ValueText.EndsWith("Controller"))
-                .Where(x => !x.AttributeLists.Any(y => y.Attributes.Any(attribute => !httpAttributesList.Contains(attribute.Name.ToString())))))
+                .Where(x => !x.AttributeLists.Any(y => y.Attributes.Any(attribute => httpAttributesList.Contains(attribute.Name.ToString())))))
             {
                 _logger.Write(method, Type, warningMessage);
             }
